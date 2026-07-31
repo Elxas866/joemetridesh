@@ -33,8 +33,8 @@ int main() {
         velocityY += g;
         playerY += velocityY;
 
-        scaleX += (1.0f - scaleX) * 0.5;
-        scaleY += (1.0f - scaleY) * 0.5;
+        scaleX += (1.0f - scaleX) * 0.2f;
+        scaleY += (1.0f - scaleY) * 0.2f;
 
 
         for (float& x : enemyXPositions) {
@@ -44,15 +44,17 @@ int main() {
         if (playerY + playerSize + velocityY >= groundLevel) {
             velocityY = 0;
             playerY = groundLevel - playerSize; // reset player position to ground level
-            scaleX = 1.2f; // reset scale to normal
-            scaleY = 0.8f; // reset scale to normal
+            if (!grounded) {
+                scaleX = 1.3f;
+                scaleY = 0.7f;
+            }
             grounded = true;
         }
 
         if (IsKeyPressed(KEY_SPACE) && grounded) {
             velocityY = -25; // jump velocity
-            scaleX = 0.8f; // scale down the player in the x direction
-            scaleY = 1.2f; // scale up the player in the y direction
+            scaleX = 0.3f; // scale down the player in the x direction
+            scaleY = 1.7f; // scale up the player in the y direction
             grounded = false;
         }
 
