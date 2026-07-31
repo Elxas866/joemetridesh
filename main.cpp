@@ -12,6 +12,10 @@ int main() {
     int score = 0;
     GameMode gameMode = GameMode::SHIP; // default game mode
 
+    float groundLevel = 380.0f; // ground level
+    bool grounded = false;
+    bool gameOver = false;
+
     float velocityY = 0.0f;
     float enemySpeed = 5.0f; // speed of the enemy
     float g = 1.7f; // gravity
@@ -24,16 +28,10 @@ int main() {
     float scaleY = 1.0f; // scale factor for the player in the y direction
     float tiltAngle = 0.0f; // tilt angle of the player
     
-    Enemy initialEnemy = { 800.0f, 380.0f, 30.0f, 30.0f, EnemyType::SPIKE }; // initial position of the first enemy
+    Enemy initialEnemy = { 800.0f, groundLevel, 30.0f, 30.0f, EnemyType::SPIKE }; // initial position of the first enemy
     std::vector<Enemy> enemies = { initialEnemy }; // initial position of the first enemy
-    float enemyWidth = 30.0f; // width of the enemy
-    float enemyHeight = 30.0f; // height of the enemy
     int enemyCount = 1; // number of enemies
     int maxEnemies = 5; // maximum number of enemies
-
-    float groundLevel = 380.0f; // ground level
-    bool grounded = false;
-    bool gameOver = false;
 
     Rectangle restartButton = { 300, 250, 200, 50 };
     Rectangle quitButton = { 300, 320, 200, 50 };
@@ -82,7 +80,7 @@ int main() {
         }
 
 
-        if (enemies.front().x < -enemyWidth) {
+        if (enemies.front().x < -initialEnemy.width) { // if the first enemy goes off screen
             enemies.erase(enemies.begin()); // remove the first enemy if it goes off screen
             enemyCount--;
         }
@@ -91,13 +89,13 @@ int main() {
             Enemy newEnemy;
             switch (gameMode) {
                 case GameMode::CUBE:
-                    newEnemy = { 800.0f, 380.0f, 30.0f, 30.0f, EnemyType::SPIKE };
+                    newEnemy = { 800.0f, groundLevel, 30.0f, 30.0f, EnemyType::SPIKE };
                     break;
                 case GameMode::SHIP:
-                    newEnemy = { 800.0f, (float) GetRandomValue(0, 380), 30.0f, 30.0f, EnemyType::CUBE };
+                    newEnemy = { 800.0f, (float) GetRandomValue(0, groundLevel), 30.0f, 30.0f, EnemyType::CUBE };
                     break;
                 default:
-                    newEnemy = { 800.0f, 380.0f, 30.0f, 30.0f, EnemyType::SPIKE };
+                    newEnemy = { 800.0f, groundLevel, 30.0f, 30.0f, EnemyType::SPIKE };
                     break;
             }
             enemies.push_back(newEnemy); // add a new enemy at the right edge
@@ -107,11 +105,23 @@ int main() {
 
         
         for (const Enemy& enemy : enemies) {
-            if (CheckCollisionRecs({ playerX, playerY, playerWidth, playerHeight }, { enemy.x, groundLevel - enemy.height, enemy.width, enemy.height })) {
-                // Collision detected
-                gameOver = true;
-                continue; // Skip further checks if game is over
+            switch (enemy.type) {
+                case EnemyType::SPIKE:
+                    if (CheckCollisionRecs({ playerX, playerY, playerWidth, playerHeight }, { enemy.x, enemy.y - enemy.height, enemy.width, enemy.height })) {
+                        // Collision detected
+                        gameOver = true;
+                        continue; // Skip further checks if game is over
+                    }
+                    break;
+                case EnemyType::CUBE:
+                    if (CheckCollisionRecs({ playerX, playerY, playerWidth, playerHeight }, { enemy.x, enemy.y, enemy.width, -enemy.height })) {
+                        // Collision detected
+                        gameOver = true;
+                        continue; // Skip further checks if game is over
+                    }
+                    break;
             }
+
         }
 
         if (gameOver && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
@@ -184,12 +194,14 @@ int main() {
         for (const Enemy& enemy : enemies) {
             switch (enemy.type) {
                 case EnemyType::SPIKE:
-                    DrawTriangle({ enemy.x + enemyWidth, groundLevel }, { enemy.x + enemyWidth / 2, groundLevel - enemyHeight }, { enemy.x, groundLevel }, PINK);
+                    DrawTriangle({ enemy.x + enemy.width, enemy.y }, { enemy.x + enemy.width / 2, enemy.y - enemy.height }, { enemy.x, enemy.y }, PINK);
                     break;
                 case EnemyType::CUBE:
-                    DrawRectangle(enemy.x, enemy.y, enemyWidth, enemyHeight, PINK);
+                    DrawRectangle(enemy.x, enemy.y, enemy.width, enemy.height, PINK);
                     break;
             }
+
+            //DrawRectangleLines(enemy.x, enemy.y, enemy.width, -enemy.height, BLACK); // show hitbox for debugging
         }
 
         EndDrawing();
