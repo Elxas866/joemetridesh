@@ -28,6 +28,9 @@ int main() {
     bool grounded = false;
     bool gameOver = false;
 
+    Rectangle restartButton = { 300, 250, 200, 50 };
+    Rectangle quitButton = { 300, 320, 200, 50 };
+
     while (!WindowShouldClose()) {
         // 1. Update: Logik, Input, Physik berechnen
         velocityY += g;
@@ -77,17 +80,47 @@ int main() {
             }
         }
 
+        if (gameOver && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+            Vector2 mousePos = GetMousePosition();
+            if (CheckCollisionPointRec(mousePos, restartButton)) {
+                // Restart the game
+                gameOver = false;
+                playerX = 100.0f;
+                playerY = 20.0f;
+                velocityY = 0.0f;
+                enemyXPositions.clear();
+                enemyXPositions.push_back(initialEnemyX);
+                enemyCount = 1;
+                scaleX = 1.0f;
+                scaleY = 1.0f;
+
+                enemySpeed = 5.0f; // reset enemy speed
+            }
+
+            if (CheckCollisionPointRec(mousePos, quitButton)) {
+                // Quit the game
+                CloseWindow();
+                return 0;
+            }
+        }
+
         BeginDrawing();
         ClearBackground(SKYBLUE);
         // 2. Draw: alles zeichnen
 
         if (gameOver) { 
-            DrawText("Game Over!", 300, 200, 40, RED);
-            EndDrawing();
+            velocityY = 0; // stop the player from moving
+            enemySpeed = 0; // stop the enemies from moving
 
-            WaitTime(3); // Wait for 3 seconds before closing the window
-            CloseWindow();
-            return 0; // Exit the game loop
+            DrawText("Game Over!", 300, 200, 40, RED);
+            
+            // restart button
+            DrawRectangleRec(restartButton, DARKGRAY);
+            DrawText("Restart", 350, 260, 30, WHITE);
+
+            // quit button
+            DrawRectangleRec(quitButton, DARKGRAY);
+            DrawText("Quit", 370, 330, 30, WHITE);
         }
 
         // ground
