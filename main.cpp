@@ -10,7 +10,7 @@ int main() {
     SetTargetFPS(60);
 
     int score = 0;
-    GameMode gameMode = GameMode::CUBE; // default game mode
+    GameMode gameMode = GameMode::SHIP; // default game mode
 
     float velocityY = 0.0f;
     float enemySpeed = 5.0f; // speed of the enemy
@@ -88,7 +88,19 @@ int main() {
         }
 
         while (enemyCount < maxEnemies && enemies.back().x < 600 && GetRandomValue(0, 100) < 5) { // chance to spawn a new enemy
-            enemies.push_back(initialEnemy); // add a new enemy at the right edge
+            Enemy newEnemy;
+            switch (gameMode) {
+                case GameMode::CUBE:
+                    newEnemy = { 800.0f, 380.0f, 30.0f, 30.0f, EnemyType::SPIKE };
+                    break;
+                case GameMode::SHIP:
+                    newEnemy = { 800.0f, (float) GetRandomValue(0, 380), 30.0f, 30.0f, EnemyType::CUBE };
+                    break;
+                default:
+                    newEnemy = { 800.0f, 380.0f, 30.0f, 30.0f, EnemyType::SPIKE };
+                    break;
+            }
+            enemies.push_back(newEnemy); // add a new enemy at the right edge
             enemyCount++;
             score += 10 + GetRandomValue(0, 10);
         }
@@ -170,7 +182,14 @@ int main() {
 
         // enemies
         for (const Enemy& enemy : enemies) {
-            DrawTriangle({ enemy.x + enemyWidth, groundLevel }, { enemy.x + enemyWidth / 2, groundLevel - enemyHeight }, { enemy.x, groundLevel }, PINK);
+            switch (enemy.type) {
+                case EnemyType::SPIKE:
+                    DrawTriangle({ enemy.x + enemyWidth, groundLevel }, { enemy.x + enemyWidth / 2, groundLevel - enemyHeight }, { enemy.x, groundLevel }, PINK);
+                    break;
+                case EnemyType::CUBE:
+                    DrawRectangle(enemy.x, enemy.y, enemyWidth, enemyHeight, PINK);
+                    break;
+            }
         }
 
         EndDrawing();
