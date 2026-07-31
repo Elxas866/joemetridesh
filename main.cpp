@@ -17,9 +17,11 @@ int main() {
 
     float playerX = 100.0f; // initial position of the player
     float playerY = 20.0f; // initial position of the player
-    float playerSize = 40.0f; // size of the player
+    float playerWidth = 40.0f; // width of the player
+    float playerHeight = 40.0f; // height of the player
     float scaleX = 1.0f; // scale factor for the player in the x direction
     float scaleY = 1.0f; // scale factor for the player in the y direction
+    float tiltAngle = 0.0f; // tilt angle of the player
     
     float initialEnemyX = 750.0f; // initial position of the first enemy
     std::vector<float> enemyXPositions = { initialEnemyX }; // initial position of the first enemy
@@ -48,9 +50,9 @@ int main() {
             x -= enemySpeed; // move enemy to the left
         }
 
-        if (playerY + playerSize + velocityY >= groundLevel) {
+        if (playerY + playerHeight + velocityY >= groundLevel) {
             velocityY = 0;
-            playerY = groundLevel - playerSize; // reset player position to ground level
+            playerY = groundLevel - playerHeight; // reset player position to ground level
             if (!grounded) {
                 scaleX = 1.3f;
                 scaleY = 0.7f;
@@ -67,12 +69,15 @@ int main() {
             }
         } else if (gameMode == GameMode::SHIP) {
             if (IsKeyDown(KEY_SPACE)) {
+                tiltAngle = -20.0f; // tilt the player upwards
                 g = 0.5f; // reduce gravity for upward thrust
                 while (velocityY > -7.0f) { // limit upward speed
                     velocityY -= g; // apply upward thrust
                 }
                 scaleX = 1.0f; // reset scale in the x direction
                 scaleY = 1.0f; // reset scale in the y direction
+            } else {
+                tiltAngle = 20.0f; // tilt the player downwards
             }
         }
 
@@ -90,7 +95,7 @@ int main() {
 
         
         for (float enemyX : enemyXPositions) {
-            if (CheckCollisionRecs({ playerX, playerY, playerSize, playerSize }, { enemyX, groundLevel - enemyHeight, enemyWidth, enemyHeight })) {
+            if (CheckCollisionRecs({ playerX, playerY, playerWidth, playerHeight }, { enemyX, groundLevel - enemyHeight, enemyWidth, enemyHeight })) {
                 // Collision detected
                 gameOver = true;
                 continue; // Skip further checks if game is over
@@ -150,10 +155,16 @@ int main() {
         // player
         switch (gameMode) {
             case GameMode::CUBE:
-                DrawRectanglePro({playerX + playerSize / 2, playerY + playerSize / 2, playerSize * scaleX, playerSize * scaleY}, {playerSize * scaleX / 2, playerSize * scaleY / 2}, 0, VIOLET);
+                if (playerWidth > 40) {
+                    playerWidth = 40; // reset player width to original size
+                }
+                DrawRectanglePro({playerX + playerWidth / 2, playerY + playerHeight / 2, playerWidth * scaleX, playerHeight * scaleY}, {playerWidth * scaleX / 2, playerHeight * scaleY / 2}, 0, VIOLET);
                 break;
             case GameMode::SHIP:
-                DrawTriangle({playerX + playerSize, playerY + playerSize / 2}, {playerX, playerY}, {playerX, playerY + playerSize}, VIOLET);
+                if (playerWidth == 40) {
+                    playerWidth = playerWidth * 2; // change width for ship mode
+                }
+                DrawRectanglePro({playerX + playerWidth / 2, playerY + playerHeight / 2, playerWidth * scaleX, playerHeight * scaleY}, {playerWidth * scaleX / 2, playerHeight * scaleY / 2}, tiltAngle, VIOLET);
                 break;
         }
 
