@@ -1,6 +1,7 @@
 #include "raylib.h"
 #include <iostream>
 #include <vector>
+#include <cmath>
 
 int main() {
     InitWindow(800, 450, "Joe Metri Desh");
@@ -13,8 +14,8 @@ int main() {
     float playerX = 100.0f; // initial position of the player
     float playerY = 20.0f; // initial position of the player
     float playerSize = 40.0f; // size of the player
-    float playerRotation = 0.0f; // rotation of the player
-    float playerRotationSpeed = 5.0f; // rotation speed of the player
+    float scaleX = 1.0f; // scale factor for the player in the x direction
+    float scaleY = 1.0f; // scale factor for the player in the y direction
     
     float initialEnemyX = 750.0f; // initial position of the first enemy
     std::vector<float> enemyXPositions = { initialEnemyX }; // initial position of the first enemy
@@ -30,27 +31,29 @@ int main() {
     while (!WindowShouldClose()) {
         // 1. Update: Logik, Input, Physik berechnen
         velocityY += g;
-
         playerY += velocityY;
+
+        scaleX += (1.0f - scaleX) * 0.5;
+        scaleY += (1.0f - scaleY) * 0.5;
+
+
         for (float& x : enemyXPositions) {
             x -= enemySpeed; // move enemy to the left
         }
 
         if (playerY + playerSize + velocityY >= groundLevel) {
-            grounded = true;
             velocityY = 0;
             playerY = groundLevel - playerSize; // reset player position to ground level
+            scaleX = 1.2f; // reset scale to normal
+            scaleY = 0.8f; // reset scale to normal
+            grounded = true;
         }
 
         if (IsKeyPressed(KEY_SPACE) && grounded) {
             velocityY = -25; // jump velocity
+            scaleX = 0.8f; // scale down the player in the x direction
+            scaleY = 1.2f; // scale up the player in the y direction
             grounded = false;
-        }
-
-        if (!grounded) {
-            playerRotation += playerRotationSpeed; // rotate the player while in the air
-        } else {
-            playerRotation = 0; // reset rotation when grounded
         }
 
         if (enemyXPositions.front() < -enemyWidth) {
@@ -89,7 +92,7 @@ int main() {
         DrawRectangle(0, groundLevel, 800, 450 - groundLevel, BLUE);
 
         // player
-        DrawRectanglePro({playerX + playerSize / 2, playerY + playerSize / 2, playerSize, playerSize}, {playerSize / 2, playerSize / 2}, playerRotation, VIOLET);
+        DrawRectanglePro({playerX + playerSize / 2, playerY + playerSize / 2, playerSize * scaleX, playerSize * scaleY}, {playerSize * scaleX / 2, playerSize * scaleY / 2}, 0, VIOLET);
 
         // enemies
         for (float enemyX : enemyXPositions) {
