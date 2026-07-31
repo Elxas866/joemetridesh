@@ -3,7 +3,9 @@
 
 enum class EnemyType {
     SPIKE,
-    CUBE
+    CUBE,
+    SHIP_PORTAL,
+    CUBE_PORTAL
 };
 
 struct Enemy {

@@ -10,7 +10,7 @@ int main() {
     SetTargetFPS(60);
 
     int score = 0;
-    GameMode gameMode = GameMode::SHIP; // default game mode
+    GameMode gameMode = GameMode::CUBE; // default game mode
 
     float groundLevel = 380.0f; // ground level
     bool grounded = false;
@@ -101,6 +101,24 @@ int main() {
             enemies.push_back(newEnemy); // add a new enemy at the right edge
             enemyCount++;
             score += 10 + GetRandomValue(0, 10);
+        }
+
+        // spawn portals
+        if (GetRandomValue(0, 1000) < 5) { // chance to spawn a portal
+            Enemy newEnemy;
+            switch (gameMode) {
+                case GameMode::CUBE:
+                    newEnemy = { 800.0f, groundLevel, 30.0f, 50.0f, EnemyType::SHIP_PORTAL };
+                    break;
+                case GameMode::SHIP:
+                    newEnemy = { 800.0f, (float) GetRandomValue(0, groundLevel), 30.0f, 50.0f, EnemyType::CUBE_PORTAL };
+                    break;
+                default:
+                    newEnemy = { 800.0f, groundLevel, 30.0f, 50.0f, EnemyType::SHIP_PORTAL };
+                    break;
+            }
+            enemies.push_back(newEnemy); // add a new portal at the right edge
+            enemyCount++;
         }
 
         
@@ -198,6 +216,12 @@ int main() {
                     break;
                 case EnemyType::CUBE:
                     DrawRectangle(enemy.x, enemy.y, enemy.width, enemy.height, PINK);
+                    break;
+                case EnemyType::SHIP_PORTAL:
+                    DrawEllipse(enemy.x + enemy.width / 2, enemy.y - enemy.height / 2, enemy.width / 2, enemy.height / 2, GREEN);
+                    break;
+                case EnemyType::CUBE_PORTAL:
+                    DrawEllipse(enemy.x + enemy.width / 2, enemy.y - enemy.height / 2, enemy.width / 2, enemy.height / 2, YELLOW);
                     break;
             }
 
