@@ -50,7 +50,7 @@ int main() {
             enemyCount--;
         }
 
-        while (enemyCount < maxEnemies && enemyXPositions.back() < 500) {
+        while (enemyCount < maxEnemies && enemyXPositions.back() < 600 && GetRandomValue(0, 100) < 5) { // chance to spawn a new enemy
             enemyXPositions.push_back(initialEnemyX); // add a new enemy at the right edge
             enemyCount++;
         }
