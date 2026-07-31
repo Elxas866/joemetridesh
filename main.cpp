@@ -7,6 +7,8 @@ int main() {
     InitWindow(800, 450, "Joe Metri Desh");
     SetTargetFPS(60);
 
+    int score = 0;
+
     float velocityY = 0.0f;
     float enemySpeed = 5.0f; // speed of the enemy
     float g = 1.7f; // gravity
@@ -69,6 +71,7 @@ int main() {
         while (enemyCount < maxEnemies && enemyXPositions.back() < 600 && GetRandomValue(0, 100) < 5) { // chance to spawn a new enemy
             enemyXPositions.push_back(initialEnemyX); // add a new enemy at the right edge
             enemyCount++;
+            score += 10 + GetRandomValue(0, 10);
         }
 
         
@@ -94,6 +97,7 @@ int main() {
                 scaleX = 1.0f;
                 scaleY = 1.0f;
 
+                score = 0; // reset score
                 enemySpeed = 5.0f; // reset enemy speed
             }
 
@@ -122,6 +126,9 @@ int main() {
             DrawRectangleRec(quitButton, DARKGRAY);
             DrawText("Quit", 370, 330, 30, WHITE);
         }
+
+        // score
+        DrawText(TextFormat("Score: %d", score), 10, 10, 20, ORANGE);
 
         // ground
         DrawRectangle(0, groundLevel, 800, 450 - groundLevel, BLUE);
