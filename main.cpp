@@ -41,6 +41,7 @@ int main() {
         // 1. Update: Logik, Input, Physik berechnen
         velocityY += g;
         playerY += velocityY;
+        tiltAngle += (20.0f - tiltAngle) * 0.1f; // gradually return to 0 degrees
 
         scaleX += (1.0f - scaleX) * 0.2f;
         scaleY += (1.0f - scaleY) * 0.2f;
@@ -76,8 +77,6 @@ int main() {
                 }
                 scaleX = 1.0f; // reset scale in the x direction
                 scaleY = 1.0f; // reset scale in the y direction
-            } else {
-                tiltAngle = 20.0f; // tilt the player downwards
             }
         }
 
