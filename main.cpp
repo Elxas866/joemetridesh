@@ -32,6 +32,7 @@ int main() {
     std::vector<Enemy> enemies = { initialEnemy }; // initial position of the first enemy
     int enemyCount = 1; // number of enemies
     int maxEnemies = 5; // maximum number of enemies
+    int portalCount = 0; // number of portals
 
     Rectangle restartButton = { 300, 250, 200, 50 };
     Rectangle quitButton = { 300, 320, 200, 50 };
@@ -83,6 +84,10 @@ int main() {
         if (enemies.front().x < -initialEnemy.width) { // if the first enemy goes off screen
             enemies.erase(enemies.begin()); // remove the first enemy if it goes off screen
             enemyCount--;
+
+            if (enemies.front().type == EnemyType::SHIP_PORTAL || enemies.front().type == EnemyType::CUBE_PORTAL) {
+                portalCount--; // decrease portal count if a portal goes off screen
+            }
         }
 
         while (enemyCount < maxEnemies && enemies.back().x < 600 && GetRandomValue(0, 100) < 5) { // chance to spawn a new enemy
@@ -104,7 +109,7 @@ int main() {
         }
 
         // spawn portals
-        if (GetRandomValue(0, 1000) < 1) { // chance to spawn a portal
+        if (portalCount < 1 && GetRandomValue(0, 1000) < 1) { // chance to spawn a portal
             Enemy newEnemy;
             switch (gameMode) {
                 case GameMode::CUBE:
@@ -119,6 +124,7 @@ int main() {
             }
             enemies.push_back(newEnemy); // add a new portal at the right edge
             enemyCount++;
+            portalCount++;
         }
 
         
