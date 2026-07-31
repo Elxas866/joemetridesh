@@ -104,7 +104,7 @@ int main() {
         }
 
         // spawn portals
-        if (GetRandomValue(0, 1000) < 5) { // chance to spawn a portal
+        if (GetRandomValue(0, 1000) < 1) { // chance to spawn a portal
             Enemy newEnemy;
             switch (gameMode) {
                 case GameMode::CUBE:
@@ -138,8 +138,22 @@ int main() {
                         continue; // Skip further checks if game is over
                     }
                     break;
+                case EnemyType::SHIP_PORTAL:
+                    if (CheckCollisionRecs({ playerX, playerY, playerWidth, playerHeight }, { enemy.x, enemy.y - enemy.height, enemy.width, enemy.height })) {
+                        // Collision detected
+                        gameMode = GameMode::SHIP; // switch to ship mode
+                        continue; // Skip further checks if game mode changed
+                    }
+                    break;
+                case EnemyType::CUBE_PORTAL:
+                    if (CheckCollisionRecs({ playerX, playerY, playerWidth, playerHeight }, { enemy.x, enemy.y - enemy.height, enemy.width, enemy.height })) {
+                        // Collision detected
+                        gameMode = GameMode::CUBE; // switch to cube mode
+                        g = 1.7f; // reset gravity for cube mode
+                        continue; // Skip further checks if game mode changed
+                    }
+                    break;
             }
-
         }
 
         if (gameOver && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
@@ -147,6 +161,8 @@ int main() {
             if (CheckCollisionPointRec(mousePos, restartButton)) {
                 // Restart the game
                 gameOver = false;
+                gameMode = GameMode::CUBE; // reset to default game mode
+                g = 1.7f; // reset gravity for cube mode
                 playerX = 100.0f;
                 playerY = 20.0f;
                 velocityY = 0.0f;
