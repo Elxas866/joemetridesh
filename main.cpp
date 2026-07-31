@@ -148,7 +148,14 @@ int main() {
         DrawRectangle(0, groundLevel, 800, 450 - groundLevel, BLUE);
 
         // player
-        DrawRectanglePro({playerX + playerSize / 2, playerY + playerSize / 2, playerSize * scaleX, playerSize * scaleY}, {playerSize * scaleX / 2, playerSize * scaleY / 2}, 0, VIOLET);
+        switch (gameMode) {
+            case GameMode::CUBE:
+                DrawRectanglePro({playerX + playerSize / 2, playerY + playerSize / 2, playerSize * scaleX, playerSize * scaleY}, {playerSize * scaleX / 2, playerSize * scaleY / 2}, 0, VIOLET);
+                break;
+            case GameMode::SHIP:
+                DrawTriangle({playerX + playerSize, playerY + playerSize / 2}, {playerX, playerY}, {playerX, playerY + playerSize}, VIOLET);
+                break;
+        }
 
         // enemies
         for (float enemyX : enemyXPositions) {
