@@ -95,7 +95,7 @@ int main() {
 
         
         for (const Enemy& enemy : enemies) {
-            if (CheckCollisionRecs({ playerX, playerY, playerWidth, playerHeight }, { enemy.x, groundLevel - enemy.y, enemy.width, enemy.height })) {
+            if (CheckCollisionRecs({ playerX, playerY, playerWidth, playerHeight }, { enemy.x, groundLevel - enemy.height, enemy.width, enemy.height })) {
                 // Collision detected
                 gameOver = true;
                 continue; // Skip further checks if game is over
