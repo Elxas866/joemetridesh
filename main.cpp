@@ -2,14 +2,15 @@
 #include <iostream>
 #include <vector>
 #include <cmath>
-#include "gameMode.cpp"
+#include "gameMode.h"
+#include "enemy.h"
 
 int main() {
     InitWindow(800, 450, "Joe Metri Desh");
     SetTargetFPS(60);
 
     int score = 0;
-    GameMode gameMode = GameMode::SHIP; // default game mode
+    GameMode gameMode = GameMode::CUBE; // default game mode
 
     float velocityY = 0.0f;
     float enemySpeed = 5.0f; // speed of the enemy
@@ -23,8 +24,8 @@ int main() {
     float scaleY = 1.0f; // scale factor for the player in the y direction
     float tiltAngle = 0.0f; // tilt angle of the player
     
-    float initialEnemyX = 750.0f; // initial position of the first enemy
-    std::vector<float> enemyXPositions = { initialEnemyX }; // initial position of the first enemy
+    Enemy initialEnemy = { 800.0f, 380.0f, 30.0f, 30.0f, EnemyType::SPIKE }; // initial position of the first enemy
+    std::vector<Enemy> enemies = { initialEnemy }; // initial position of the first enemy
     float enemyWidth = 30.0f; // width of the enemy
     float enemyHeight = 30.0f; // height of the enemy
     int enemyCount = 1; // number of enemies
@@ -47,8 +48,8 @@ int main() {
         scaleY += (1.0f - scaleY) * 0.2f;
 
 
-        for (float& x : enemyXPositions) {
-            x -= enemySpeed; // move enemy to the left
+        for (Enemy& enemy : enemies) {
+            enemy.x -= enemySpeed; // move enemy to the left
         }
 
         if (playerY + playerHeight + velocityY >= groundLevel) {
@@ -81,20 +82,20 @@ int main() {
         }
 
 
-        if (enemyXPositions.front() < -enemyWidth) {
-            enemyXPositions.erase(enemyXPositions.begin()); // remove the first enemy if it goes off screen
+        if (enemies.front().x < -enemyWidth) {
+            enemies.erase(enemies.begin()); // remove the first enemy if it goes off screen
             enemyCount--;
         }
 
-        while (enemyCount < maxEnemies && enemyXPositions.back() < 600 && GetRandomValue(0, 100) < 5) { // chance to spawn a new enemy
-            enemyXPositions.push_back(initialEnemyX); // add a new enemy at the right edge
+        while (enemyCount < maxEnemies && enemies.back().x < 600 && GetRandomValue(0, 100) < 5) { // chance to spawn a new enemy
+            enemies.push_back(initialEnemy); // add a new enemy at the right edge
             enemyCount++;
             score += 10 + GetRandomValue(0, 10);
         }
 
         
-        for (float enemyX : enemyXPositions) {
-            if (CheckCollisionRecs({ playerX, playerY, playerWidth, playerHeight }, { enemyX, groundLevel - enemyHeight, enemyWidth, enemyHeight })) {
+        for (const Enemy& enemy : enemies) {
+            if (CheckCollisionRecs({ playerX, playerY, playerWidth, playerHeight }, { enemy.x, groundLevel - enemy.y, enemy.width, enemy.height })) {
                 // Collision detected
                 gameOver = true;
                 continue; // Skip further checks if game is over
@@ -109,8 +110,8 @@ int main() {
                 playerX = 100.0f;
                 playerY = 20.0f;
                 velocityY = 0.0f;
-                enemyXPositions.clear();
-                enemyXPositions.push_back(initialEnemyX);
+                enemies.clear();
+                enemies.push_back(initialEnemy);
                 enemyCount = 1;
                 scaleX = 1.0f;
                 scaleY = 1.0f;
@@ -168,8 +169,8 @@ int main() {
         }
 
         // enemies
-        for (float enemyX : enemyXPositions) {
-            DrawTriangle({ enemyX + enemyWidth, groundLevel }, { enemyX + enemyWidth / 2, groundLevel - enemyHeight }, { enemyX, groundLevel }, PINK);
+        for (const Enemy& enemy : enemies) {
+            DrawTriangle({ enemy.x + enemyWidth, groundLevel }, { enemy.x + enemyWidth / 2, groundLevel - enemyHeight }, { enemy.x, groundLevel }, PINK);
         }
 
         EndDrawing();
