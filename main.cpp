@@ -2,12 +2,14 @@
 #include <iostream>
 #include <vector>
 #include <cmath>
+#include "gameMode.cpp"
 
 int main() {
     InitWindow(800, 450, "Joe Metri Desh");
     SetTargetFPS(60);
 
     int score = 0;
+    GameMode gameMode = GameMode::SHIP; // default game mode
 
     float velocityY = 0.0f;
     float enemySpeed = 5.0f; // speed of the enemy
@@ -56,12 +58,24 @@ int main() {
             grounded = true;
         }
 
-        if (IsKeyPressed(KEY_SPACE) && grounded) {
-            velocityY = -25; // jump velocity
-            scaleX = 0.3f; // scale down the player in the x direction
-            scaleY = 1.7f; // scale up the player in the y direction
-            grounded = false;
+        if (gameMode == GameMode::CUBE) {
+            if (IsKeyPressed(KEY_SPACE) && grounded) {
+                velocityY = -25; // jump velocity
+                scaleX = 0.3f; // scale down the player in the x direction
+                scaleY = 1.7f; // scale up the player in the y direction
+                grounded = false;
+            }
+        } else if (gameMode == GameMode::SHIP) {
+            if (IsKeyDown(KEY_SPACE)) {
+                g = 0.5f; // reduce gravity for upward thrust
+                while (velocityY > -7.0f) { // limit upward speed
+                    velocityY -= g; // apply upward thrust
+                }
+                scaleX = 1.0f; // reset scale in the x direction
+                scaleY = 1.0f; // reset scale in the y direction
+            }
         }
+
 
         if (enemyXPositions.front() < -enemyWidth) {
             enemyXPositions.erase(enemyXPositions.begin()); // remove the first enemy if it goes off screen
