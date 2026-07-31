@@ -13,6 +13,8 @@ int main() {
     float playerX = 100.0f; // initial position of the player
     float playerY = 20.0f; // initial position of the player
     float playerSize = 40.0f; // size of the player
+    float playerRotation = 0.0f; // rotation of the player
+    float playerRotationSpeed = 5.0f; // rotation speed of the player
     
     float initialEnemyX = 750.0f; // initial position of the first enemy
     std::vector<float> enemyXPositions = { initialEnemyX }; // initial position of the first enemy
@@ -43,6 +45,12 @@ int main() {
         if (IsKeyPressed(KEY_SPACE) && grounded) {
             velocityY = -25; // jump velocity
             grounded = false;
+        }
+
+        if (!grounded) {
+            playerRotation += playerRotationSpeed; // rotate the player while in the air
+        } else {
+            playerRotation = 0; // reset rotation when grounded
         }
 
         if (enemyXPositions.front() < -enemyWidth) {
@@ -81,7 +89,7 @@ int main() {
         DrawRectangle(0, groundLevel, 800, 450 - groundLevel, BLUE);
 
         // player
-        DrawRectangle(playerX, playerY, playerSize, playerSize, VIOLET);
+        DrawRectanglePro({playerX + playerSize / 2, playerY + playerSize / 2, playerSize, playerSize}, {playerSize / 2, playerSize / 2}, playerRotation, VIOLET);
 
         // enemies
         for (float enemyX : enemyXPositions) {
