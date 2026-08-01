@@ -7,7 +7,11 @@
 
 int main() {
     InitWindow(800, 450, "Joe Metri Desh");
+    InitAudioDevice();
     SetTargetFPS(60);
+
+    Music bgMusic = LoadMusicStream("1600007_Framb039s-Kitchen.mp3");
+    PlayMusicStream(bgMusic);
 
     int score = 0;
     GameMode gameMode = GameMode::CUBE; // default game mode
@@ -40,6 +44,8 @@ int main() {
 
     while (!WindowShouldClose()) {
         // 1. Update: Logik, Input, Physik berechnen
+        UpdateMusicStream(bgMusic);
+
         velocityY += g;
         playerY += velocityY;
         tiltAngle += (20.0f - tiltAngle) * 0.1f; // gradually return to 0 degrees
@@ -132,6 +138,7 @@ int main() {
                     if (CheckCollisionRecs({ playerX, playerY, playerWidth, playerHeight }, { enemy.x, enemy.y - enemy.height, enemy.width, enemy.height })) {
                         // Collision detected
                         gameOver = true;
+                        StopMusicStream(bgMusic);
                         continue; // Skip further checks if game is over
                     }
                     break;
@@ -139,6 +146,7 @@ int main() {
                     if (CheckCollisionRecs({ playerX, playerY, playerWidth, playerHeight }, { enemy.x, enemy.y, enemy.width, -enemy.height })) {
                         // Collision detected
                         gameOver = true;
+                        StopMusicStream(bgMusic);
                         continue; // Skip further checks if game is over
                     }
                     break;
@@ -179,6 +187,8 @@ int main() {
 
                 score = 0; // reset score
                 enemySpeed = 5.0f; // reset enemy speed
+
+                PlayMusicStream(bgMusic); // restart background music
             }
 
             if (CheckCollisionPointRec(mousePos, quitButton)) {
@@ -252,6 +262,8 @@ int main() {
         EndDrawing();
     }
 
+    UnloadMusicStream(bgMusic);
+    CloseAudioDevice();
     CloseWindow();
     return 0;
 }
