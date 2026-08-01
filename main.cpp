@@ -13,6 +13,8 @@ int main() {
     Music bgMusic = LoadMusicStream("1600007_Framb039s-Kitchen.mp3");
     PlayMusicStream(bgMusic);
 
+    Sound jumpSound = LoadSound("jump.wav");
+
     int score = 0;
     GameMode gameMode = GameMode::CUBE; // default game mode
 
@@ -70,6 +72,7 @@ int main() {
 
         if (gameMode == GameMode::CUBE) {
             if (IsKeyPressed(KEY_SPACE) && grounded) {
+                PlaySound(jumpSound);
                 velocityY = -25; // jump velocity
                 scaleX = 0.3f; // scale down the player in the x direction
                 scaleY = 1.7f; // scale up the player in the y direction
@@ -263,6 +266,7 @@ int main() {
     }
 
     UnloadMusicStream(bgMusic);
+    UnloadSound(jumpSound);
     CloseAudioDevice();
     CloseWindow();
     return 0;
