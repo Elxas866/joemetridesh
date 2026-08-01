@@ -107,7 +107,7 @@ int main() {
         }
 
         // spawn portals
-        if (portalCount < 1 && GetRandomValue(0, 10) < 1) { // chance to spawn a portal
+        if (portalCount < 1 && GetRandomValue(0, 1000) < 1) { // chance to spawn a portal
             Enemy newEnemy;
             switch (gameMode) {
                 case GameMode::CUBE:
