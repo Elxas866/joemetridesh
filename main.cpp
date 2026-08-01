@@ -19,6 +19,7 @@ int main() {
     float velocityY = 0.0f;
     float enemySpeed = 5.0f; // speed of the enemy
     float g = 1.7f; // gravity
+    float thrust = 1.3f; // thrust for ship mode
 
     float playerX = 100.0f; // initial position of the player
     float playerY = 20.0f; // initial position of the player
@@ -71,10 +72,7 @@ int main() {
         } else if (gameMode == GameMode::SHIP) {
             if (IsKeyDown(KEY_SPACE)) {
                 tiltAngle = -20.0f; // tilt the player upwards
-                g = 0.5f; // reduce gravity for upward thrust
-                while (velocityY > -7.0f) { // limit upward speed
-                    velocityY -= g; // apply upward thrust
-                }
+                velocityY -= thrust;
                 scaleX = 1.0f; // reset scale in the x direction
                 scaleY = 1.0f; // reset scale in the y direction
             }
@@ -109,7 +107,7 @@ int main() {
         }
 
         // spawn portals
-        if (portalCount < 1 && GetRandomValue(0, 1000) < 1) { // chance to spawn a portal
+        if (portalCount < 1 && GetRandomValue(0, 10) < 1) { // chance to spawn a portal
             Enemy newEnemy;
             switch (gameMode) {
                 case GameMode::CUBE:
@@ -148,6 +146,7 @@ int main() {
                     if (CheckCollisionRecs({ playerX, playerY, playerWidth, playerHeight }, { enemy.x, enemy.y - enemy.height, enemy.width, enemy.height })) {
                         // Collision detected
                         gameMode = GameMode::SHIP; // switch to ship mode
+                        g = 0.5f; // set gravity for ship mode
                         continue; // Skip further checks if game mode changed
                     }
                     break;
